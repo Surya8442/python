@@ -1,0 +1,15 @@
+# Web framework (if using Flask for API or web app)
+Flask==2.3.3
+
+# Requests library for HTTP calls
+requests==2.31.0
+
+# For JSON or data processing
+pandas==2.1.1
+numpy==1.26.0
+
+# Optional: environment variables handling
+python-dotenv==1.0.1
+
+# Optional: for logging
+loguru==0.7.0

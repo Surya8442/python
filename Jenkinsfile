@@ -15,19 +15,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                }
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
         stage('Run Container') {
             steps {
-                script {
-                    docker.image("${IMAGE_NAME}:${IMAGE_TAG}").inside {
-                        sh "python src/main.py"
-                    }
-                }
+                sh "docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} python src/main.py"
             }
         }
 

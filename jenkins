@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "python_app_image"
+        IMAGE_TAG = "latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/yourusername/yourrepo.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                script {
+                    docker.image("${IMAGE_NAME}:${IMAGE_TAG}").inside {
+                        sh "python src/main.py"
+                    }
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
